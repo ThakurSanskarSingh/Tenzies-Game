@@ -24,6 +24,31 @@ function App() {
     }
     const [dice , setDice] = useState(allNewDice())
     const [Tenzies , setTenzies] = useState(false)
+    const[second , setSecond] = useState(0)
+    const[minute , setMinute] = useState(0)
+    const [interValid,setInterValid] = useState(null)
+
+
+  
+    useEffect(() => {
+     const timer = setInterval(() => {
+          setSecond(second+1)
+          if(second === 59) {
+            setMinute(minute+1)
+            setSecond(0)
+          }
+        }, 1000);
+        setInterValid(timer)
+      return ()=> clearInterval(timer)
+    },[second,minute])
+
+    const restart = () => {
+       setSecond(0)
+      setMinute(0)
+    }
+    const stop = () => {
+      clearInterval(interValid)
+    }
 
 
     useEffect( ()=> {
@@ -32,12 +57,15 @@ function App() {
      const allSameValue = dice.every(die => die.value === firstValue)
      if(allHeld && allSameValue){
       setTenzies(true)
+      stop();
       console.log("You Won")
      }
     },[dice])
     
+
     function Roll() {
           if(!Tenzies){
+            
             setDice(oldDice => oldDice.map(
               die => {
                return die.isHeld ? die : 
@@ -46,9 +74,11 @@ function App() {
                   isHeld : false ,
                   id : nanoid()
                 }
+                
               }
             ))
           }  else {
+            restart();
             setTenzies(false)
             setDice(allNewDice())
           }
@@ -81,6 +111,10 @@ function App() {
     
   {diceElements}
 
+  </div>
+  <div className="time">
+    <h2>Time taken : </h2>
+    <h2>{minute<10? "0" + minute : minute} : {second < 10 ? "0" + second : second}</h2>
   </div>
   <button onClick={Roll} className='roll-dice'> {Tenzies ? "New Game" : "Roll"}</button>
 
