@@ -3,7 +3,7 @@ import { useState } from 'react'
 import './App.css'
 import Die from "./components/die.jsx"
 import { nanoid } from 'nanoid'
-
+import Confetti from 'react-confetti'
 
 
 
@@ -27,9 +27,14 @@ function App() {
     const[second , setSecond] = useState(0)
     const[minute , setMinute] = useState(0)
     const [interValid,setInterValid] = useState(null)
+    const [count , setCount] = useState(0)
 
 
-  
+    function checkCount() {
+      setCount(prevCount => prevCount + 1)
+      return count
+    }
+      
     useEffect(() => {
      const timer = setInterval(() => {
           setSecond(second+1)
@@ -57,15 +62,21 @@ function App() {
      const allSameValue = dice.every(die => die.value === firstValue)
      if(allHeld && allSameValue){
       setTenzies(true)
+      h3.innerHTML = text
       stop();
-      console.log("You Won")
+           setCount(0)
+          
      }
     },[dice])
     
+    let text = `<h3>Total no. of rolls used : ${count}</h3>`
+    let h3 = document.querySelector(".clicked")
+
 
     function Roll() {
+      checkCount()
           if(!Tenzies){
-            
+           
             setDice(oldDice => oldDice.map(
               die => {
                return die.isHeld ? die : 
@@ -102,6 +113,7 @@ function App() {
    
   
   <main>
+    {Tenzies && <Confetti/>}
      <h1 className="title">Tenzies</h1>
             <p className="instructions">Roll until all dice are the same. <br/>
              Click each die to freeze it at its current value between rolls.
@@ -114,7 +126,11 @@ function App() {
   </div>
   <div className="time">
     <h2>Time taken : </h2>
+
     <h2>{minute<10? "0" + minute : minute} : {second < 10 ? "0" + second : second}</h2>
+  </div>
+  <div className="clicked">
+    <h3>No. of Rolls: {count}</h3>
   </div>
   <button onClick={Roll} className='roll-dice'> {Tenzies ? "New Game" : "Roll"}</button>
 
